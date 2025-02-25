@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lagersimulation (Single-Page)</title>
+  <link rel="stylesheet" href="Lager.css" />
+</head>
+<body>
+  <header>
+    <!-- Titel anklickbar: ruft den allgemeinen Startbildschirm auf -->
+    <h1 style="cursor: pointer;" onclick="showSection('startScreen')">Lagersimulation</h1>
+    <nav>
+      <!-- GUEST/KUNDE NAV (wird für Gäste und Kunden verwendet) -->
+      <span id="guestNav">
+        <button id="btnLogin" onclick="showSection('loginScreen')">Login</button>
+        <button id="btnRegister" onclick="showSection('registerScreen')">Registrierung</button>
+        <button id="btnBestellen" onclick="handleOrder()">Bestellen</button>
+        <button id="btnLogout" onclick="logoutUser()" style="display: none;">Logout</button>
+      </span>
+      <!-- ADMIN NAV -->
+      <span id="adminNav" style="display: none;">
+        <button onclick="showSection('adminArtikelScreen')">Artikel Verwaltung</button>
+        <button onclick="showSection('adminLagerScreen')">Lager Verwaltung</button>
+        <button onclick="showSection('adminKundenScreen')">Kunden Verwaltung</button>
+        <button onclick="handleOrder()">Bestellen</button>
+        <button onclick="logoutUser()">Logout</button>
+      </span>
+      <!-- LAGERIST NAV -->
+      <span id="lageristNav" style="display: none;">
+        <button onclick="showSection('lagerWareneingangScreen')">Wareneingang</button>
+        <button onclick="showSection('lagerEinlagerungScreen')">Einlagerung</button>
+        <button onclick="showSection('lagerUmlagerungScreen')">Umlagerung</button>
+        <button onclick="showSection('lagerKommissionierungScreen')">Kommissionierung</button>
+        <button onclick="showSection('lagerWarenausgangScreen')">Warenausgang</button>
+        <button onclick="handleOrder()">Bestellen</button>
+        <button onclick="logoutUser()">Logout</button>
+      </span>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ALLGEMEINER STARTBILDSCHIRM -->
+    <section id="startScreen">
+      <h2>Willkommen!</h2>
+      <div>
+        <label for="searchInput">Artikel suchen:</label>
+        <input type="text" id="searchInput" placeholder="Artikelnummer, Name oder Beschreibung" />
+        <button onclick="searchArticles()">Suchen</button>
+      </div>
+      <table id="articleTable">
+        <thead>
+          <tr>
+            <th>Artikel-Nr.</th>
+            <th>Bezeichnung</th>
+            <th>Beschreibung</th>
+            <th>Bestand</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- LOGIN-BILDSCHIRM -->
+    <section id="loginScreen" style="display: none;">
+      <h2>Login</h2>
+      <div id="loginError" style="color: red;"></div>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <label>Benutzername: <input type="text" name="username" required /></label><br /><br />
+        <label>Passwort: <input type="password" name="password" id="loginPassword" required /></label>
+        <button type="button" onclick="togglePassword('loginPassword')">Passwort anzeigen</button><br /><br />
+        <button type="submit">Anmelden</button>
+      </form>
+    </section>
+
+    <!-- REGISTRIERUNGS-BILDSCHIRM -->
+    <section id="registerScreen" style="display: none;">
+      <h2>Registrierung</h2>
+      <div id="registerError" style="color: red;"></div>
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <label>Vorname: <input type="text" name="vorname" required /></label><br /><br />
+        <label>Geschlecht: 
+          <select name="gender" id="genderSelect" onchange="checkDivers()">
+            <option value="Männlich">Männlich</option>
+            <option value="Weiblich">Weiblich</option>
+            <option value="Divers">Divers</option>
+          </select>
+        </label>
+        <div id="customGenderField" style="display: none;">
+          <label>Eigenes Geschlecht: <input type="text" name="customGender" /></label>
+        </div>
+        <br /><br />
+        <label>Benutzername: <input type="text" name="username" required /></label><br /><br />
+        <label>Straße + Hausnummer: <input type="text" name="strasse" /></label><br /><br />
+        <label>PLZ + Ort: <input type="text" name="ort" /></label><br /><br />
+        <label>E-Mail: <input type="email" name="email" required /></label><br /><br />
+        <label>Passwort: <input type="password" name="password" id="regPassword" required /></label>
+        <button type="button" onclick="togglePassword('regPassword')">Passwort anzeigen</button><br /><br />
+        <label>Passwort wiederholen: <input type="password" name="passwordRepeat" id="regPasswordRepeat" required /></label>
+        <button type="button" onclick="togglePassword('regPasswordRepeat')">Passwort anzeigen</button><br /><br />
+        <button type="submit">Registrieren</button>
+      </form>
+    </section>
+
+    <!-- BESTELLFORMULAR -->
+    <section id="orderForm" style="display: none;">
+      <h2>Bestellung aufgeben</h2>
+      <form id="orderFormElement" onsubmit="submitOrder(event)">
+        <div id="orderFormContent">
+          <!-- Dynamisch per JS gefüllt -->
+        </div>
+        <button type="submit">Bestellen</button>
+      </form>
+    </section>
+
+    <!-- BESTELLDATEN (Detailseite) -->
+    <section id="orderDetail" style="display: none;">
+      <h2>Bestelldetail</h2>
+      <div id="orderDetailContent">
+        <!-- Zusammenfassung der Bestellung -->
+      </div>
+      <button onclick="showSection('startScreen')">Weiter</button>
+    </section>
+
+    <!-- ADMIN-BEREICH (Platzhalter) -->
+    <section id="adminArtikelScreen" style="display: none;">
+      <h2>Artikelverwaltung</h2>
+      <p>Platzhalter: Hier können Artikel hinzugefügt, bearbeitet oder gelöscht werden.</p>
+    </section>
+    <section id="adminLagerScreen" style="display: none;">
+      <h2>Lagerverwaltung</h2>
+      <p>Platzhalter: Übersicht der Lagerplätze, usw.</p>
+    </section>
+    <section id="adminKundenScreen" style="display: none;">
+      <h2>Kundenverwaltung</h2>
+      <p>Platzhalter: Hier können Benutzer angelegt, Rollen zugewiesen usw. werden.</p>
+    </section>
+
+    <!-- LAGERIST-BEREICH (Platzhalter) -->
+    <section id="lagerWareneingangScreen" style="display: none;">
+      <h2>Wareneingang</h2>
+      <p>Platzhalter: Liste ankommender LKWs, etc.</p>
+    </section>
+    <section id="lagerEinlagerungScreen" style="display: none;">
+      <h2>Einlagerung</h2>
+      <p>Platzhalter: Artikel in freie Lagerplätze einlagern.</p>
+    </section>
+    <section id="lagerUmlagerungScreen" style="display: none;">
+      <h2>Umlagerung</h2>
+      <p>Platzhalter: Artikel von einem Lagerplatz zu einem anderen verlagern.</p>
+    </section>
+    <section id="lagerKommissionierungScreen" style="display: none;">
+      <h2>Kommissionierung</h2>
+      <p>Platzhalter: Bestellungen zusammenstellen.</p>
+    </section>
+    <section id="lagerWarenausgangScreen" style="display: none;">
+      <h2>Warenausgang</h2>
+      <p>Platzhalter: Fertige Paletten auf LKW verladen.</p>
+    </section>
+  </main>
+
+  <script src="client.js"></script>
+</body>
+</html>
