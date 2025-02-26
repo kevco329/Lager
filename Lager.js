@@ -6,10 +6,8 @@
  * 2. Browser öffnen: http://127.0.0.1:8000/
  *
  * Enthält:
- * - Server-Setup auf 127.0.0.1:8000
- * - Routen für /register, /login, /updateUser
- * - Route /articles (zum Laden von Artikeldaten)
- * - Bcrypt für Passwort-Hashing
+ * - Endpunkte für Registrierung, Login, Artikelverwaltung und Benutzerverwaltung.
+ * - Verwendet bcrypt zum Hashen von Passwörtern.
  */
 
 const express = require('express');
@@ -31,65 +29,34 @@ const db = new sqlite3.Database('./Lager.db', (err) => {
   }
 });
 
-// Middleware: Parsen von URL-encoded und JSON-Daten
+// Middleware: URL-encoded und JSON-Daten parsen
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Statische Dateien bereitstellen (HTML, CSS, JS) aus dem aktuellen Ordner
+// Statische Dateien bereitstellen (HTML, CSS, JS)
 app.use(express.static('.'));
 
-// GET-Route für '/' → Liefert unsere Single-Page (Lager.html)
+// GET: Liefert die HTML-Seite
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/Lager.html');
 });
 
-/**
- * POST /register
- * Erwartet Felder wie:
- * {
- *   "role": "Kunde",
- *   "vorname": "...",
- *   "gender": "...",
- *   "customGender": "...",
- *   "username": "...",
- *   "strasse": "...",
- *   "ort": "...",
- *   "email": "...",
- *   "password": "..."
- * }
- * Speichert Benutzer in der DB, Passwort wird gehasht.
- */
+/* Registrierung */
 app.post('/register', (req, res) => {
-  const {
-    role,
-    vorname,
-    gender,
-    customGender,
-    username,
-    strasse,
-    ort,
-    email,
-    password
-  } = req.body;
-
-  // Check auf nötige Felder
+  const { role, vorname, gender, customGender, username, strasse, ort, email, password } = req.body;
   if (!username || !email || !password || !role) {
     return res.status(400).send('Fehlende Felder.');
   }
-
-  // Passwort hashen
   bcrypt.hash(password, saltRounds, (err, hash) => {
     if (err) {
       console.error('Fehler beim Hashing des Passworts:', err);
       return res.status(500).send('Fehler beim Passwort-Hashing.');
     }
-
-    // Die users-Tabelle muss Spalten für vorname, strasse, ort usw. haben.
     const sql = `
       INSERT INTO users (username, email, password, role, gender, customGender, vorname, strasse, ort)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    db.run(sql, [username, email, hash, role, gender, customGender, vorname, strasse, ort], function (err) {
+    db.run(sql, [username, email, hash, role, gender, customGender, vorname, strasse, ort], function(err) {
       if (err) {
         console.error('Fehler beim Einfügen des Benutzers:', err.message);
         return res.status(500).send('Fehler beim Erstellen des Benutzers.');
@@ -99,21 +66,12 @@ app.post('/register', (req, res) => {
   });
 });
 
-/**
- * POST /login
- * Erwartet:
- * {
- *   "username": "...",
- *   "password": "..."
- * }
- * Vergleicht Passwort mit Hash und gibt JSON { message, role } zurück.
- */
+/* Login */
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
     return res.status(400).send('Fehlende Felder.');
   }
-
   const sql = 'SELECT * FROM users WHERE username = ?';
   db.get(sql, [username], (err, row) => {
     if (err) {
@@ -123,14 +81,12 @@ app.post('/login', (req, res) => {
     if (!row) {
       return res.status(400).send('Benutzer nicht gefunden.');
     }
-    // Passwortvergleich
     bcrypt.compare(password, row.password, (err, result) => {
       if (err) {
         console.error('Fehler beim Passwortvergleich:', err);
         return res.status(500).send('Fehler beim Einloggen.');
       }
       if (result) {
-        // Login erfolgreich
         res.json({ message: 'Login erfolgreich', role: row.role });
       } else {
         res.status(400).send('Falsches Passwort.');
@@ -139,31 +95,9 @@ app.post('/login', (req, res) => {
   });
 });
 
-/**
- * POST /updateUser
- * Beispiel: Rolle ändern oder sonstige Felder updaten
- */
-app.post('/updateUser', (req, res) => {
-  const { id, username, email, role } = req.body;
-  if (!id || !username || !email || !role) {
-    return res.status(400).send('Fehlende Felder.');
-  }
-  const sql = `UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?`;
-  db.run(sql, [username, email, role, id], function (err) {
-    if (err) {
-      console.error('Fehler beim Aktualisieren des Benutzers:', err.message);
-      return res.status(500).send('Fehler beim Aktualisieren.');
-    }
-    res.send('Benutzerdaten erfolgreich aktualisiert.');
-  });
-});
-
-/**
- * GET /articles
- * Lädt Artikel aus der DB und gibt sie als JSON zurück
- */
+/* GET: Artikelliste */
 app.get('/articles', (req, res) => {
-  const sql = 'SELECT artikelNr, bezeichnung, beschreibung, bestand FROM artikel';
+  const sql = 'SELECT artikelNr, bezeichnung, beschreibung, bestand, mindestbestand, id FROM artikel';
   db.all(sql, [], (err, rows) => {
     if (err) {
       console.error('Fehler beim Lesen der Artikel:', err.message);
@@ -171,6 +105,134 @@ app.get('/articles', (req, res) => {
     }
     res.json(rows);
   });
+});
+
+/* ARTIKELVERWALTUNG */
+app.post('/article', (req, res) => {
+  const { artikelNr, bezeichnung, beschreibung, bestand, mindestbestand } = req.body;
+  if (!artikelNr || !bezeichnung) {
+    return res.status(400).send("ArtikelNr und Bezeichnung sind erforderlich.");
+  }
+  const sql = `INSERT INTO artikel (artikelNr, bezeichnung, beschreibung, bestand, mindestbestand)
+               VALUES (?, ?, ?, ?, ?)`;
+  db.run(sql, [artikelNr, bezeichnung, beschreibung, bestand, mindestbestand], function(err) {
+    if (err) {
+      console.error("Fehler beim Hinzufügen des Artikels:", err.message);
+      return res.status(500).send("Fehler beim Hinzufügen des Artikels.");
+    }
+    res.send("Artikel erfolgreich hinzugefügt.");
+  });
+});
+
+app.delete('/article/:id', (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM artikel WHERE id = ?";
+  db.run(sql, [id], function(err) {
+    if (err) {
+      console.error("Fehler beim Löschen des Artikels:", err.message);
+      return res.status(500).send("Fehler beim Löschen des Artikels.");
+    }
+    res.send("Artikel erfolgreich gelöscht.");
+  });
+});
+
+app.put('/article/:id', (req, res) => {
+  const id = req.params.id;
+  const { bezeichnung, beschreibung, bestand, mindestbestand } = req.body;
+  const sql = "UPDATE artikel SET bezeichnung = ?, beschreibung = ?, bestand = ?, mindestbestand = ? WHERE id = ?";
+  db.run(sql, [bezeichnung, beschreibung, bestand, mindestbestand, id], function(err) {
+    if (err) {
+      console.error("Fehler beim Aktualisieren des Artikels:", err.message);
+      return res.status(500).send("Fehler beim Aktualisieren des Artikels.");
+    }
+    res.send("Artikel erfolgreich aktualisiert.");
+  });
+});
+
+/* BENUTZER-VERWALTUNG */
+app.get('/users', (req, res) => {
+  const sql = 'SELECT id, username, email, role, vorname, gender, strasse, ort FROM users';
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Fehler beim Lesen der Benutzer:", err.message);
+      return res.status(500).send("Fehler beim Lesen der Benutzer.");
+    }
+    res.json(rows);
+  });
+});
+
+app.post('/user', (req, res) => {
+  const { username, email, role, vorname, gender, strasse, ort, password } = req.body;
+  if (!username || !email || !password || !role) {
+    return res.status(400).send("Fehlende Felder (Benutzername, E-Mail, Passwort, Rolle).");
+  }
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    if (err) {
+      console.error("Fehler beim Hashing des Passworts:", err);
+      return res.status(500).send("Fehler beim Passwort-Hashing.");
+    }
+    const sql = `
+      INSERT INTO users (username, email, password, role, vorname, gender, strasse, ort)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.run(sql, [username, email, hash, role, vorname, gender, strasse, ort], function(err) {
+      if (err) {
+        console.error("Fehler beim Anlegen des Benutzers:", err.message);
+        return res.status(500).send("Fehler beim Anlegen des Benutzers.");
+      }
+      res.send("Benutzer erfolgreich angelegt.");
+    });
+  });
+});
+
+app.delete('/user/:id', (req, res) => {
+  const id = req.params.id;
+  const sql = "DELETE FROM users WHERE id = ?";
+  db.run(sql, [id], function(err) {
+    if (err) {
+      console.error("Fehler beim Löschen des Benutzers:", err.message);
+      return res.status(500).send("Fehler beim Löschen des Benutzers.");
+    }
+    res.send("Benutzer erfolgreich gelöscht.");
+  });
+});
+
+app.put('/user/:id', (req, res) => {
+  const id = req.params.id;
+  const { username, email, role, vorname, gender, strasse, ort, password } = req.body;
+  if (!password) {
+    const sql = `
+      UPDATE users
+      SET username = ?, email = ?, role = ?, vorname = ?, gender = ?, strasse = ?, ort = ?
+      WHERE id = ?
+    `;
+    db.run(sql, [username, email, role, vorname, gender, strasse, ort, id], function(err) {
+      if (err) {
+        console.error("Fehler beim Aktualisieren des Benutzers (ohne Passwort):", err.message);
+        return res.status(500).send("Fehler beim Aktualisieren des Benutzers (ohne Passwort).");
+      }
+      res.send("Benutzer erfolgreich aktualisiert (ohne Passwort-Änderung).");
+    });
+  } else {
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+      if (err) {
+        console.error("Fehler beim Hashing des Passworts:", err);
+        return res.status(500).send("Fehler beim Passwort-Hashing.");
+      }
+      const sql = `
+        UPDATE users
+        SET username = ?, email = ?, role = ?, vorname = ?, gender = ?, strasse = ?, ort = ?, password = ?
+        WHERE id = ?
+      `;
+      db.run(sql, [username, email, role, vorname, gender, strasse, ort, hash, id], function(err) {
+        if (err) {
+          console.error("Fehler beim Aktualisieren des Benutzers (mit Passwort):", err.message);
+          return res.status(500).send("Fehler beim Aktualisieren des Benutzers (mit Passwort).");
+        }
+        res.send("Benutzer erfolgreich aktualisiert (inkl. Passwort).");
+      });
+    });
+  }
 });
 
 // Server starten

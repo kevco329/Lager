@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Lager Simulation - Lagerist</title>
+  <link rel="stylesheet" href="LagerSimulation.css">
+</head>
+<body>
+  <header>
+    <!-- Der Titel führt zurück zur Hauptseite -->
+    <h1 style="cursor: pointer;" onclick="goBack()">Lager Simulation</h1>
+    <nav>
+      <button onclick="showSection('wareneingang')">Wareneingang</button>
+      <button onclick="showSection('einlagerung')">Einlagerung</button>
+      <button onclick="showSection('kommissionierung')">Kommissionierung</button>
+      <button onclick="showSection('warenausgang')">Warenausgang</button>
+      <button onclick="showSection('umlagerung')">Umlagerung</button>
+    </nav>
+  </header>
+  <main>
+    <!-- Wareneingang -->
+    <section id="wareneingang">
+      <h2>Wareneingang</h2>
+      <div id="eingangArea">
+        <div class="tor" id="tor1">
+          <span>Tor 1</span>
+          <div class="lkw" id="lkw1">LKW 1</div>
+        </div>
+        <div class="tor" id="tor2">
+          <span>Tor 2</span>
+          <div class="lkw" id="lkw2">LKW 2</div>
+        </div>
+      </div>
+      <div id="eingangGoods">
+        <p>Eingetroffene Waren:</p>
+        <div class="good" id="good1">Warenpaket 1</div>
+        <div class="good" id="good2">Warenpaket 2</div>
+      </div>
+    </section>
+
+    <!-- Einlagerung -->
+    <section id="einlagerung" style="display:none;">
+      <h2>Einlagerung</h2>
+      <div id="einlagerungArea">
+        <div id="pallets">
+          <p>Paletten vom Wareneingang:</p>
+          <div class="pallet" id="pallet1">Palette 1</div>
+          <div class="pallet" id="pallet2">Palette 2</div>
+        </div>
+        <div id="lagerplaetze">
+          <p>Lagerplätze:</p>
+          <div class="lagerplatz" id="lager1">Lager 1</div>
+          <div class="lagerplatz" id="lager2">Lager 2</div>
+          <div class="lagerplatz" id="lager3">Lager 3</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kommissionierung -->
+    <section id="kommissionierung" style="display:none;">
+      <h2>Kommissionierung</h2>
+      <div id="kommissionierungArea">
+        <div id="lagerBestand">
+          <p>Lagerbestand:</p>
+          <div class="lagerplatz" id="lagerA">Lager A</div>
+          <div class="lagerplatz" id="lagerB">Lager B</div>
+        </div>
+        <div id="fertigeWaren">
+          <p>Fertige Bestellungen:</p>
+          <div class="fertig" id="fertig1">Bestellung 1</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Warenausgang -->
+    <section id="warenausgang" style="display:none;">
+      <h2>Warenausgang</h2>
+      <div id="ausgangArea">
+        <p>Fertige Paletten für den Versand:</p>
+        <div class="pallet" id="ausgangPalette1">Palette A</div>
+      </div>
+    </section>
+
+    <!-- Umlagerung -->
+    <section id="umlagerung" style="display:none;">
+      <h2>Umlagerung</h2>
+      <div id="umlagerungArea">
+        <p>Lagerplätze zur Umlagerung:</p>
+        <div class="lagerplatz" id="umlagerung1">Lager X</div>
+        <div class="lagerplatz" id="umlagerung2">Lager Y</div>
+      </div>
+    </section>
+  </main>
+  <script src="LagerSimulation.js"></script>
+</body>
+</html>
