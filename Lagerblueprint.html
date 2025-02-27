@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <title>Verkleinerter Lager-Blueprint</title>
+  <title>Lager-Blueprint mit data-row/data-col</title>
   <style>
     body {
       margin: 0;
@@ -15,100 +15,142 @@
       border: 1px solid #ccc;
       background: #fff;
     }
+    text {
+      font-family: sans-serif;
+    }
   </style>
 </head>
 <body>
 
-<svg id="blueprint" width="800" height="500">
-  <!-- Titel -->
-  <text x="20" y="30" font-size="18" font-family="sans-serif">
-    Kleiner Lager-Blueprint
+<!--
+  SVG-Gesamtgröße 1300×800 (Beispiel).
+  - Obere/untere Rahmenlinie: x=200..1000, y=80..680
+  - Linke Segmentlinie (keine Linie hinter Toren)
+  - Rechte Segmentlinie (keine Linie hinter Toren)
+  - Wareneingangstore links (80×80), Warenausgangstore rechts (80×80)
+  - 5 Regal-Reihen, 5 Felder pro Reihe -> data-row="i", data-col="j"
+  - Palettenplätze unten links und rechts
+-->
+
+<svg id="blueprint" width="1300" height="800">
+
+  <!-- Titel oben -->
+  <text x="300" y="40" font-size="18">
+    Kommissionier/Umlagerungsbereich mit Regalen und den dazu gehörigen Plätzen
   </text>
 
-  <!-- WARNEEINGANG (links) -->
-  <text x="20" y="60" font-size="14" font-family="sans-serif">
-    Wareneingang
+  <!-- Obere Rahmenlinie -->
+  <line x1="200" y1="80" x2="1000" y2="80" stroke="black" stroke-width="2" />
+  <!-- Untere Rahmenlinie -->
+  <line x1="200" y1="680" x2="1000" y2="680" stroke="black" stroke-width="2" />
+
+  <!-- Wareneingangsbereich (links) -->
+  <text x="120" y="120" font-size="14">Wareneingangsbereich</text>
+  <!-- Vier Tore (80×80), rechts bündig an x=200 => also x=120..200 -->
+  <rect x="120" y="150" width="80" height="80" fill="black" />
+  <rect x="120" y="270" width="80" height="80" fill="black" />
+  <rect x="120" y="390" width="80" height="80" fill="black" />
+  <rect x="120" y="510" width="80" height="80" fill="black" />
+
+  <!-- Linke Rahmenlinie in Segmenten (um die Tore herum) -->
+  <line x1="200" y1="80" x2="200" y2="150" stroke="black" stroke-width="2" />
+  <line x1="200" y1="230" x2="200" y2="270" stroke="black" stroke-width="2" />
+  <line x1="200" y1="350" x2="200" y2="390" stroke="black" stroke-width="2" />
+  <line x1="200" y1="470" x2="200" y2="510" stroke="black" stroke-width="2" />
+  <line x1="200" y1="590" x2="200" y2="680" stroke="black" stroke-width="2" />
+
+  <!-- Warenausgangsbereich (rechts) -->
+  <text x="1000" y="120" font-size="14">Warenausgangsbereich</text>
+  <!-- Vier Tore (80×80), links bündig an x=1000 => x=1000..1080 -->
+  <rect x="1000" y="150" width="80" height="80" fill="black" />
+  <rect x="1000" y="270" width="80" height="80" fill="black" />
+  <rect x="1000" y="390" width="80" height="80" fill="black" />
+  <rect x="1000" y="510" width="80" height="80" fill="black" />
+
+  <!-- Rechte Rahmenlinie in Segmenten (um die Tore herum) -->
+  <line x1="1000" y1="80" x2="1000" y2="150" stroke="black" stroke-width="2" />
+  <line x1="1000" y1="230" x2="1000" y2="270" stroke="black" stroke-width="2" />
+  <line x1="1000" y1="350" x2="1000" y2="390" stroke="black" stroke-width="2" />
+  <line x1="1000" y1="470" x2="1000" y2="510" stroke="black" stroke-width="2" />
+  <line x1="1000" y1="590" x2="1000" y2="680" stroke="black" stroke-width="2" />
+
+  <!-- 5 Regal-Reihen, 5 Felder pro Reihe => data-row, data-col -->
+  <!-- Wir machen pro Reihe 5 <rect> je 100 px breit, 40 px hoch. 
+       Start x=350, y=80 + (rowIndex)*80 (Beispiel 80 px Abstand).
+  -->
+  <!-- REIHE 1: y=80 (Zeile 1) -->
+  <!-- Felder col=1..5 => x=350,450,550,650,750; y=80 -->
+  <rect x="350" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="1"/>
+  <rect x="450" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="2"/>
+  <rect x="550" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="3"/>
+  <rect x="650" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="4"/>
+  <rect x="750" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="5"/>
+
+  <!-- REIHE 2: y=160 (Zeile 2) -->
+  <rect x="350" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="1"/>
+  <rect x="450" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="2"/>
+  <rect x="550" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="3"/>
+  <rect x="650" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="4"/>
+  <rect x="750" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="5"/>
+
+  <!-- REIHE 3: y=240 (Zeile 3) -->
+  <rect x="350" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="1"/>
+  <rect x="450" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="2"/>
+  <rect x="550" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="3"/>
+  <rect x="650" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="4"/>
+  <rect x="750" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="5"/>
+
+  <!-- REIHE 4: y=320 (Zeile 4) -->
+  <rect x="350" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="1"/>
+  <rect x="450" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="2"/>
+  <rect x="550" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="3"/>
+  <rect x="650" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="4"/>
+  <rect x="750" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="5"/>
+
+  <!-- REIHE 5: y=400 (Zeile 5) -->
+  <rect x="350" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="1"/>
+  <rect x="450" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="2"/>
+  <rect x="550" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="3"/>
+  <rect x="650" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="4"/>
+  <rect x="750" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="5"/>
+
+  <!-- Palettenabstellplätze unten links (2×2) -->
+  <text x="220" y="550" font-size="12">
+    Palettenabstellplätze (4 Stück) zw. Wareneingang & Regalen
   </text>
+  <rect x="210" y="560" width="40" height="40" fill="black"/>
+  <rect x="260" y="560" width="40" height="40" fill="black"/>
+  <rect x="210" y="610" width="40" height="40" fill="black"/>
+  <rect x="260" y="610" width="40" height="40" fill="black"/>
 
-  <!-- Drei Tore W1, W2, W3 -->
-  <!-- Tor W1 -->
-  <rect x="10" y="70" width="80" height="50" fill="none" stroke="black" />
-  <text x="15" y="90" font-size="12" font-family="sans-serif">Tor W1</text>
-  <!-- Tor W2 -->
-  <rect x="10" y="130" width="80" height="50" fill="none" stroke="black" />
-  <text x="15" y="150" font-size="12" font-family="sans-serif">Tor W2</text>
-  <!-- Tor W3 -->
-  <rect x="10" y="190" width="80" height="50" fill="none" stroke="black" />
-  <text x="15" y="210" font-size="12" font-family="sans-serif">Tor W3</text>
-
-  <!-- Abstellplatz Wareneingang -->
-  <text x="10" y="270" font-size="12" font-family="sans-serif">
-    Abstellplatz (Eingang)
+  <!-- Palettenabstellplätze unten rechts (2×2) -->
+  <text x="730" y="550" font-size="12">
+    Palettenabstellplätze (4 Stück) zw. Regalen & Warenausgang
   </text>
-  <rect x="10" y="280" width="80" height="60" fill="none" stroke="black" />
-  <line x1="10" y1="310" x2="90" y2="310" stroke="black" stroke-dasharray="4" />
+  <rect x="900" y="560" width="40" height="40" fill="black"/>
+  <rect x="950" y="560" width="40" height="40" fill="black"/>
+  <rect x="900" y="610" width="40" height="40" fill="black"/>
+  <rect x="950" y="610" width="40" height="40" fill="black"/>
 
-  <!-- Fahrweg zum Regalbereich (gestrichelt) -->
-  <line x1="90" y1="100" x2="150" y2="100" stroke="black" stroke-dasharray="5,5"/>
-  <line x1="90" y1="160" x2="150" y2="160" stroke="black" stroke-dasharray="5,5"/>
-  <line x1="90" y1="220" x2="150" y2="220" stroke="black" stroke-dasharray="5,5"/>
+  <!-- Optionales Script inline (kleine Demo-Funktion) -->
+  <script>
+    // Hebt ein bestimmtes Regal-Feld hervor
+    function highlightRegalPosition(row, col) {
+      // row, col => z.B. 2,1
+      const selector = '[data-row="' + row + '"][data-col="' + col + '"]';
+      const feld = document.querySelector(selector);
+      if (feld) {
+        feld.setAttribute("stroke", "red");
+        feld.setAttribute("stroke-width", "3");
+      }
+    }
 
-  <!-- REGALBEREICH (mittig) -->
-  <text x="280" y="60" font-size="14" font-family="sans-serif">Regalbereich</text>
-  <!-- Gesamtumriss -->
-  <rect x="150" y="70" width="350" height="250" fill="none" stroke="black" />
+    // Beispiel-Aufruf:
+    // highlightRegalPosition(2,1); // Markiert Reihe 2, Feld 1
+    // highlightRegalPosition(3,4); // Markiert Reihe 3, Feld 4
+  </script>
 
-  <!-- Zwei Regale: jeweils eine senkrechte Trennung in der Mitte -->
-  <!-- Regal 1 (links), Regal 2 (rechts) durch senkrechte Linie -->
-  <line x1="250" y1="70" x2="250" y2="320" stroke="black" stroke-dasharray="4" />
-
-  <text x="170" y="85" font-size="12" font-family="sans-serif">Regal 1</text>
-  <text x="260" y="85" font-size="12" font-family="sans-serif">Regal 2</text>
-
-  <!-- Horizontallinien in jedem Regal (jede zweite Zeile = Regal-Ebene) -->
-  <!-- Regal 1 -->
-  <line x1="150" y1="110" x2="250" y2="110" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke (kein Strich, Durchgang) -->
-  <line x1="150" y1="150" x2="250" y2="150" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="150" y1="190" x2="250" y2="190" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="150" y1="230" x2="250" y2="230" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="150" y1="270" x2="250" y2="270" stroke="black" stroke-dasharray="2,2"/>
-
-  <!-- Regal 2 -->
-  <line x1="250" y1="110" x2="500" y2="110" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="250" y1="150" x2="500" y2="150" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="250" y1="190" x2="500" y2="190" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="250" y1="230" x2="500" y2="230" stroke="black" stroke-dasharray="2,2"/>
-  <!-- Lücke -->
-  <line x1="250" y1="270" x2="500" y2="270" stroke="black" stroke-dasharray="2,2"/>
-
-  <!-- Warenausgang (rechts) -->
-  <text x="560" y="60" font-size="14" font-family="sans-serif">Warenausgang</text>
-  <!-- Zwei Tore -->
-  <rect x="540" y="70" width="80" height="50" fill="none" stroke="black" />
-  <text x="545" y="90" font-size="12" font-family="sans-serif">Tor A</text>
-  <rect x="540" y="130" width="80" height="50" fill="none" stroke="black" />
-  <text x="545" y="150" font-size="12" font-family="sans-serif">Tor B</text>
-
-  <!-- Abstellplatz Warenausgang -->
-  <text x="540" y="220" font-size="12" font-family="sans-serif">
-    Abstellplatz (Ausgang)
-  </text>
-  <rect x="540" y="230" width="80" height="60" fill="none" stroke="black" />
-  <line x1="540" y1="260" x2="620" y2="260" stroke="black" stroke-dasharray="4" />
 </svg>
-
-<script>
-  function goBack() {
-    alert("Zurück zur Hauptseite - bitte Funktion anpassen!");
-  }
-</script>
 
 </body>
 </html>

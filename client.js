@@ -1,9 +1,3 @@
-/**
- * client.js
- * Vollständige Version mit aktualisiertem Login-Flow (loginWrapper) und Debug-Ausgaben.
- * Weitere Funktionen (Artikelverwaltung, Bestellvorgang, Benutzerverwaltung) sind ebenfalls enthalten.
- */
-
 /* ---------------------------
    Globale Funktionen & Variablen
 --------------------------- */
@@ -172,7 +166,7 @@ async function handleLogin(event) {
       const data = await res.json();
       alert(data.message + ' | Rolle: ' + data.role);
       window.currentUserRole = data.role;
-      return data.role;  // Rolle zurückgeben
+      return data.role;
     } else {
       const errMsg = await res.text();
       document.getElementById('loginError').textContent = errMsg;
@@ -208,7 +202,7 @@ async function loginWrapper(event) {
       loadAdminArticles();
     } else if (role === "Lagerist") {
       updateNavForLagerist();
-      showSection('lagerSimulationScreen');
+      showSection('lagerWareneingangScreen'); // angepasst
       if (typeof initLagerSimulation === "function") {
         initLagerSimulation();
       }
@@ -223,7 +217,6 @@ async function loginWrapper(event) {
 
 /* ---------------------------
    Admin-Funktionen (Artikel- und Benutzerverwaltung)
-   (Die folgenden Funktionen bleiben weitgehend unverändert)
 --------------------------- */
 async function loadAdminArticles() {
   try {
@@ -502,55 +495,17 @@ function logoutUser() {
   showSection('startScreen');
 }
 
-
-
 /* ---------------------------
-   Exponiere Funktionen global für HTML-Eventhandler
+   Lager-Simulation Funktionen
 --------------------------- */
-window.showSection = showSection;
-window.togglePassword = togglePassword;
-window.checkDivers = checkDivers;
-window.loadArticles = loadArticles;
-window.searchArticles = searchArticles;
-window.handleOrder = handleOrder;
-window.loadOrderForm = loadOrderForm;
-window.submitOrder = submitOrder;
-window.handleRegister = handleRegister;
-window.loginWrapper = loginWrapper;
-window.loadAdminArticles = loadAdminArticles;
-window.addArticle = addArticle;
-window.deleteArticle = deleteArticle;
-window.editArticle = editArticle;
-window.loadUsers = loadUsers;
-window.openEditUser = openEditUser;
-window.closeEditUser = closeEditUser;
-window.handleEditUserSubmit = handleEditUserSubmit;
-window.addUser = addUser;
-window.deleteUser = deleteUser;
-window.logoutUser = logoutUser;
-
-/* Beim Laden der Seite werden Artikel im Startbildschirm geladen */
-window.onload = () => {
-  loadArticles();
-};
-/**
- * Globale Variable zur Lager-Simulation:
- * selectedItem = null => kein Element ausgewählt
- */
 let selectedItem = null;
 
-/**
- * Klick-Logik: 
- * - Klicke zuerst z. B. auf eine "pallet" 
- * - Dann auf einen "lagerplatz" => "Lege palletX in lagerY ab!"
- */
 function selectItem(itemId) {
   console.log("Clicked on:", itemId);
   if (!selectedItem) {
     selectedItem = itemId;
     console.log("Selected:", selectedItem);
   } else {
-    // Aktion:
     if (selectedItem.startsWith('pallet') && itemId.startsWith('lager')) {
       alert("Lege " + selectedItem + " in " + itemId + " ab!");
     } else if (selectedItem.startsWith('good') && itemId.startsWith('pallet')) {
@@ -562,10 +517,6 @@ function selectItem(itemId) {
   }
 }
 
-/**
- * Initialisiert die Klick-Events für Wareneingang, Einlagerung usw.
- * Aufruf z. B. wenn man sich als Lagerist einloggt.
- */
 function initLagerSimulation() {
   // Wareneingang
   const tor1 = document.getElementById('tor1');
@@ -577,8 +528,8 @@ function initLagerSimulation() {
 
   if (tor1) tor1.addEventListener('click', () => selectItem('tor1'));
   if (tor2) tor2.addEventListener('click', () => selectItem('tor2'));
-  if (lkw1) lkw1.addEventListener('click', () => selectItem('lkw1'));
-  if (lkw2) lkw2.addEventListener('click', () => selectItem('lkw2'));
+  if (lkw1) lkw1.addEventListener('click', () => selectItem('lkw1')); // korrigiert
+  if (lkw2) lkw2.addEventListener('click', () => selectItem('lkw2')); // korrigiert
   if (good1) good1.addEventListener('click', () => selectItem('good1'));
   if (good2) good2.addEventListener('click', () => selectItem('good2'));
 
@@ -615,28 +566,33 @@ function initLagerSimulation() {
   if (ausgangPalette1) ausgangPalette1.addEventListener('click', () => selectItem('ausgangPalette1'));
 }
 
-/**
- * Rufe initLagerSimulation() auf, sobald man sich als Lagerist einloggt.
- * (In loginWrapper, wenn role === "Lagerist".)
- */
+/* ---------------------------
+   Exponiere Funktionen global für HTML-Eventhandler
+--------------------------- */
+window.showSection = showSection;
+window.togglePassword = togglePassword;
+window.checkDivers = checkDivers;
+window.loadArticles = loadArticles;
+window.searchArticles = searchArticles;
+window.handleOrder = handleOrder;
+window.loadOrderForm = loadOrderForm;
+window.submitOrder = submitOrder;
+window.handleRegister = handleRegister;
+window.loginWrapper = loginWrapper;
+window.loadAdminArticles = loadAdminArticles;
+window.addArticle = addArticle;
+window.deleteArticle = deleteArticle;
+window.editArticle = editArticle;
+window.loadUsers = loadUsers;
+window.openEditUser = openEditUser;
+window.closeEditUser = closeEditUser;
+window.handleEditUserSubmit = handleEditUserSubmit;
+window.addUser = addUser;
+window.deleteUser = deleteUser;
+window.logoutUser = logoutUser;
+window.initLagerSimulation = initLagerSimulation; // Exponiere initLagerSimulation
 
-/* Im loginWrapper ... */
-async function loginWrapper(event) {
-  const role = await handleLogin(event);
-  if (role) {
-    window.currentUserRole = role;
-    if (role === "Kunde") {
-      // ...
-    } else if (role === "Admin") {
-      // ...
-    } else if (role === "Lagerist") {
-      updateNavForLagerist();
-      showSection('lagerWareneingangScreen');
-      initLagerSimulation(); // <-- Hier die Simulation initialisieren
-    } else {
-      showSection('startScreen');
-    }
-  } else {
-    // ...
-  }
-}
+// Beim Laden der Seite werden Artikel im Startbildschirm geladen
+window.onload = () => {
+  loadArticles();
+};
