@@ -2,148 +2,147 @@
 
 /* Basis-Styles */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f8f8f8;
-  }
-  
-  header {
-    background-color: #004d99;
-    color: #fff;
-    padding: 1em;
-    text-align: center;
-  }
-  
-  nav {
-    margin-top: 0.5em;
-    text-align: center;
-  }
-  
-  nav button {
-    margin: 0 0.5em;
-    padding: 0.5em 1em;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    cursor: pointer;
-  }
-  
-  main {
-    padding: 1em;
-  }
-  
-  section {
-    margin-bottom: 2em;
-  }
-  
-  /* Wareneingang */
-  #eingangArea {
-    display: flex;
-    justify-content: center;
-    gap: 1em;
-  }
-  
-  .tor {
-    width: 120px;
-    height: 120px;
-    background-color: #ddd;
-    border: 2px solid #aaa;
-    text-align: center;
-    line-height: 120px;
-    cursor: pointer;
-    position: relative;
-  }
-  
-  .lkw {
-    background-color: #ffcccc;
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    right: 5px;
-    text-align: center;
-    font-size: 0.9em;
-    line-height: 1.2em;
-  }
-  
-  #eingangGoods {
-    margin-top: 1em;
-    text-align: center;
-  }
-  
-  .good {
-    background-color: #e0e0e0;
-    padding: 0.5em;
-    margin: 0.5em;
-    border: 1px solid #bbb;
-    cursor: pointer;
-    display: inline-block;
-  }
-  
-  /* Einlagerung */
-  #einlagerungArea {
-    display: flex;
-    justify-content: center;
-    gap: 2em;
-  }
-  
-  #pallets, #lagerplaetze {
-    border: 1px solid #ccc;
-    padding: 1em;
-    background-color: #fff;
-    width: 45%;
-  }
-  
-  .pallet {
-    background-color: #ffe0b3;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border: 1px solid #aa6600;
-    cursor: pointer;
-  }
-  
-  .lagerplatz {
-    background-color: #ccffcc;
-    padding: 1em;
-    margin: 0.5em 0;
-    border: 1px solid #66aa66;
-    cursor: pointer;
-  }
-  
-  /* Kommissionierung */
-  #kommissionierungArea {
-    display: flex;
-    justify-content: center;
-    gap: 2em;
-  }
-  
-  #lagerBestand, #fertigeWaren {
-    border: 1px solid #ccc;
-    padding: 1em;
-    background-color: #fff;
-    width: 45%;
-  }
-  
-  .fertig {
-    background-color: #b3d9ff;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border: 1px solid #3399ff;
-    cursor: pointer;
-  }
-  
-  /* Warenausgang */
-  #ausgangArea {
-    border: 1px solid #ccc;
-    padding: 1em;
-    background-color: #fff;
-    text-align: center;
-  }
-  
-  /* Umlagerung */
-  #umlagerungArea {
-    border: 1px solid #ccc;
-    padding: 1em;
-    background-color: #fff;
-    text-align: center;
-  }
-  
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f8f8;
+}
+
+header {
+  background-color: #004d99;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+}
+
+nav {
+  margin-top: 0.5em;
+  text-align: center;
+}
+
+nav button {
+  margin: 0 0.5em;
+  padding: 0.5em 1em;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+main {
+  padding: 1em;
+}
+
+section {
+  margin-bottom: 2em;
+}
+
+/* Wareneingang */
+#eingangArea {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+
+.tor {
+  width: 120px;
+  height: 120px;
+  background-color: #ddd;
+  border: 2px solid #aaa;
+  text-align: center;
+  line-height: 120px;
+  cursor: pointer;
+  position: relative;
+}
+
+.lkw {
+  background-color: #ffcccc;
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  right: 5px;
+  text-align: center;
+  font-size: 0.9em;
+  line-height: 1.2em;
+}
+
+#eingangGoods {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.good {
+  background-color: #e0e0e0;
+  padding: 0.5em;
+  margin: 0.5em;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  display: inline-block;
+}
+
+/* Einlagerung */
+#einlagerungArea {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+#pallets, #lagerplaetze {
+  border: 1px solid #ccc;
+  padding: 1em;
+  background-color: #fff;
+  width: 45%;
+}
+
+.pallet {
+  background-color: #ffe0b3;
+  padding: 0.5em;
+  margin: 0.5em 0;
+  border: 1px solid #aa6600;
+  cursor: pointer;
+}
+
+.lagerplatz {
+  background-color: #ccffcc;
+  padding: 1em;
+  margin: 0.5em 0;
+  border: 1px solid #66aa66;
+  cursor: pointer;
+}
+
+/* Kommissionierung */
+#kommissionierungArea {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+#lagerBestand, #fertigeWaren {
+  border: 1px solid #ccc;
+  padding: 1em;
+  background-color: #fff;
+  width: 45%;
+}
+
+.fertig {
+  background-color: #b3d9ff;
+  padding: 0.5em;
+  margin: 0.5em 0;
+  border: 1px solid #3399ff;
+  cursor: pointer;
+}
+
+/* Warenausgang */
+#ausgangArea {
+  border: 1px solid #ccc;
+  padding: 1em;
+  background-color: #fff;
+  text-align: center;
+}
+
+/* Umlagerung */
+#umlagerungArea {
+  border: 1px solid #ccc;
+  padding: 1em;
+  background-color: #fff;
+  text-align: center;
+}

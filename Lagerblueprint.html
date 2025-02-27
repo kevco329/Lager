@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8" />
-  <title>Lager-Blueprint mit data-row/data-col</title>
+  <meta charset="UTF-8" />
+  <title>Lager Game – Blueprint mit Tür & Wänden</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #f0f0f0;
+      font-family: sans-serif;
+    }
+    h1 {
+      background-color: #004d99;
+      color: #fff;
+      padding: 1em;
+      margin: 0;
+      text-align: center;
     }
     #blueprint {
       display: block;
@@ -18,56 +26,72 @@
     text {
       font-family: sans-serif;
     }
+    .highlight {
+      stroke: red !important;
+      stroke-width: 3 !important;
+    }
   </style>
 </head>
 <body>
 
-<!--
-  SVG-Gesamtgröße 1300×800 (Beispiel).
-  - Obere/untere Rahmenlinie: x=200..1000, y=80..680
-  - Linke Segmentlinie (keine Linie hinter Toren)
-  - Rechte Segmentlinie (keine Linie hinter Toren)
-  - Wareneingangstore links (80×80), Warenausgangstore rechts (80×80)
-  - 5 Regal-Reihen, 5 Felder pro Reihe -> data-row="i", data-col="j"
-  - Palettenplätze unten links und rechts
--->
+<h1>Lager-Simulation (Blueprint)</h1>
 
 <svg id="blueprint" width="1300" height="800">
 
   <!-- Titel oben -->
-  <text x="300" y="40" font-size="18">
+  <text x="280" y="40" font-size="18">
     Kommissionier/Umlagerungsbereich mit Regalen und den dazu gehörigen Plätzen
   </text>
 
   <!-- Obere Rahmenlinie -->
+  <!-- jetzt inkl. Segment von x=120..200, damit über der Tür alles zu ist -->
+  <line x1="120" y1="80" x2="200" y2="80" stroke="black" stroke-width="2" />
   <line x1="200" y1="80" x2="1000" y2="80" stroke="black" stroke-width="2" />
+
   <!-- Untere Rahmenlinie -->
   <line x1="200" y1="680" x2="1000" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- Wareneingangsbereich (links) -->
-  <text x="120" y="120" font-size="14">Wareneingangsbereich</text>
-  <!-- Vier Tore (80×80), rechts bündig an x=200 => also x=120..200 -->
-  <rect x="120" y="150" width="80" height="80" fill="black" />
-  <rect x="120" y="270" width="80" height="80" fill="black" />
-  <rect x="120" y="390" width="80" height="80" fill="black" />
-  <rect x="120" y="510" width="80" height="80" fill="black" />
+  <!-- Linker Vertikalbereich in Segmenten (inkl. Tür oben, dann Wände, dann Torlücken) -->
+  <!-- Tür schließt links bei x=120, Mauer bei x=200 -->
 
-  <!-- Linke Rahmenlinie in Segmenten (um die Tore herum) -->
-  <line x1="200" y1="80" x2="200" y2="150" stroke="black" stroke-width="2" />
+  <!-- 1) Mauer von (200,80) bis (200,230) = oberer Wandabschnitt -->
+  <line x1="200" y1="80" x2="200" y2="230" stroke="black" stroke-width="2" />
+
+  <!-- 2) Mauer zwischen Tor2 und Tür: (200,230) bis (200,270) -->
   <line x1="200" y1="230" x2="200" y2="270" stroke="black" stroke-width="2" />
+
+  <!-- Tor2 (schwarzes Rechteck) => y=270..350 -->
+  <rect id="tor2" x="120" y="270" width="80" height="80" fill="black" />
+
+  <!-- 3) Mauer zwischen Tor2 und Tor3: (200,350) bis (200,390) -->
   <line x1="200" y1="350" x2="200" y2="390" stroke="black" stroke-width="2" />
+
+  <!-- Tor3 => y=390..470 -->
+  <rect id="tor3" x="120" y="390" width="80" height="80" fill="black" />
+
+  <!-- 4) Mauer zwischen Tor3 und Tor4: (200,470) bis (200,510) -->
   <line x1="200" y1="470" x2="200" y2="510" stroke="black" stroke-width="2" />
+
+  <!-- Tor4 => y=510..590 -->
+  <rect id="tor4" x="120" y="510" width="80" height="80" fill="black" />
+
+  <!-- 5) Mauer unter Tor4 bis unten: (200,590) bis (200,680) -->
   <line x1="200" y1="590" x2="200" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- Warenausgangsbereich (rechts) -->
-  <text x="1000" y="120" font-size="14">Warenausgangsbereich</text>
-  <!-- Vier Tore (80×80), links bündig an x=1000 => x=1000..1080 -->
-  <rect x="1000" y="150" width="80" height="80" fill="black" />
-  <rect x="1000" y="270" width="80" height="80" fill="black" />
-  <rect x="1000" y="390" width="80" height="80" fill="black" />
-  <rect x="1000" y="510" width="80" height="80" fill="black" />
+  <!-- TÜR (als Linie, standardmäßig zu) -->
+  <!-- Geschlossen: verläuft vertikal von (120,80) bis (120,150) -->
+  <!-- Text "Tür" etwas darüber -->
+  <text x="110" y="70" font-size="14">Tür</text>
+  <line id="door" x1="120" y1="80" x2="120" y2="150" stroke="brown" stroke-width="4" />
 
-  <!-- Rechte Rahmenlinie in Segmenten (um die Tore herum) -->
+  <!-- Warenausgangsbereich (rechts) -->
+  <text x="1000" y="120" font-size="14">Warenausgang</text>
+  <rect id="ausgangTor1" x="1000" y="150" width="80" height="80" fill="black" />
+  <rect id="ausgangTor2" x="1000" y="270" width="80" height="80" fill="black" />
+  <rect id="ausgangTor3" x="1000" y="390" width="80" height="80" fill="black" />
+  <rect id="ausgangTor4" x="1000" y="510" width="80" height="80" fill="black" />
+
+  <!-- Rechte Rahmenlinie in Segmenten -->
   <line x1="1000" y1="80" x2="1000" y2="150" stroke="black" stroke-width="2" />
   <line x1="1000" y1="230" x2="1000" y2="270" stroke="black" stroke-width="2" />
   <line x1="1000" y1="350" x2="1000" y2="390" stroke="black" stroke-width="2" />
@@ -75,39 +99,35 @@
   <line x1="1000" y1="590" x2="1000" y2="680" stroke="black" stroke-width="2" />
 
   <!-- 5 Regal-Reihen, 5 Felder pro Reihe => data-row, data-col -->
-  <!-- Wir machen pro Reihe 5 <rect> je 100 px breit, 40 px hoch. 
-       Start x=350, y=80 + (rowIndex)*80 (Beispiel 80 px Abstand).
-  -->
-  <!-- REIHE 1: y=80 (Zeile 1) -->
-  <!-- Felder col=1..5 => x=350,450,550,650,750; y=80 -->
-  <rect x="350" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="1"/>
-  <rect x="450" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="2"/>
-  <rect x="550" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="3"/>
-  <rect x="650" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="4"/>
-  <rect x="750" y="80" width="100" height="40" fill="none" stroke="black" data-row="1" data-col="5"/>
+  <!-- REIHE 1: y=80 -->
+  <rect x="350" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="1"/>
+  <rect x="450" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="2"/>
+  <rect x="550" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="3"/>
+  <rect x="650" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="4"/>
+  <rect x="750" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="5"/>
 
-  <!-- REIHE 2: y=160 (Zeile 2) -->
+  <!-- REIHE 2: y=160 -->
   <rect x="350" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="1"/>
   <rect x="450" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="2"/>
   <rect x="550" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="3"/>
   <rect x="650" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="4"/>
   <rect x="750" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="5"/>
 
-  <!-- REIHE 3: y=240 (Zeile 3) -->
+  <!-- REIHE 3: y=240 -->
   <rect x="350" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="1"/>
   <rect x="450" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="2"/>
   <rect x="550" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="3"/>
   <rect x="650" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="4"/>
   <rect x="750" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="5"/>
 
-  <!-- REIHE 4: y=320 (Zeile 4) -->
+  <!-- REIHE 4: y=320 -->
   <rect x="350" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="1"/>
   <rect x="450" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="2"/>
   <rect x="550" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="3"/>
   <rect x="650" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="4"/>
   <rect x="750" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="5"/>
 
-  <!-- REIHE 5: y=400 (Zeile 5) -->
+  <!-- REIHE 5: y=400 -->
   <rect x="350" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="1"/>
   <rect x="450" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="2"/>
   <rect x="550" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="3"/>
@@ -118,36 +138,106 @@
   <text x="220" y="550" font-size="12">
     Palettenabstellplätze (4 Stück) zw. Wareneingang & Regalen
   </text>
-  <rect x="210" y="560" width="40" height="40" fill="black"/>
-  <rect x="260" y="560" width="40" height="40" fill="black"/>
-  <rect x="210" y="610" width="40" height="40" fill="black"/>
-  <rect x="260" y="610" width="40" height="40" fill="black"/>
+  <rect id="platzL1" x="210" y="560" width="40" height="40" fill="black"/>
+  <rect id="platzL2" x="260" y="560" width="40" height="40" fill="black"/>
+  <rect id="platzL3" x="210" y="610" width="40" height="40" fill="black"/>
+  <rect id="platzL4" x="260" y="610" width="40" height="40" fill="black"/>
 
   <!-- Palettenabstellplätze unten rechts (2×2) -->
   <text x="730" y="550" font-size="12">
     Palettenabstellplätze (4 Stück) zw. Regalen & Warenausgang
   </text>
-  <rect x="900" y="560" width="40" height="40" fill="black"/>
-  <rect x="950" y="560" width="40" height="40" fill="black"/>
-  <rect x="900" y="610" width="40" height="40" fill="black"/>
-  <rect x="950" y="610" width="40" height="40" fill="black"/>
+  <rect id="platzR1" x="900" y="560" width="40" height="40" fill="black"/>
+  <rect id="platzR2" x="950" y="560" width="40" height="40" fill="black"/>
+  <rect id="platzR3" x="900" y="610" width="40" height="40" fill="black"/>
+  <rect id="platzR4" x="950" y="610" width="40" height="40" fill="black"/>
 
-  <!-- Optionales Script inline (kleine Demo-Funktion) -->
+  <!-- Inline-Script: Tür-Logik und Klicklogik -->
   <script>
-    // Hebt ein bestimmtes Regal-Feld hervor
-    function highlightRegalPosition(row, col) {
-      // row, col => z.B. 2,1
-      const selector = '[data-row="' + row + '"][data-col="' + col + '"]';
-      const feld = document.querySelector(selector);
-      if (feld) {
-        feld.setAttribute("stroke", "red");
-        feld.setAttribute("stroke-width", "3");
+    // Spiellogik: Merken, ob die Tür offen oder zu ist
+    let doorOpen = false;
+
+    // Merken, ob wir ein Element ausgewählt haben (z.B. Palettenplatz)
+    let selectedElementId = null;
+
+    // Tür-Element
+    const doorLine = document.getElementById('door');
+
+    // Beim Klicken auf die Tür togglen wir "auf/zu"
+    doorLine.addEventListener('click', () => {
+      if (!doorOpen) {
+        // Tür öffnen => horizontal (120,80) bis (170,80)
+        doorLine.setAttribute('x2', '170');
+        doorLine.setAttribute('y2', '80');
+      } else {
+        // Tür schließen => vertikal (120,80) bis (120,150)
+        doorLine.setAttribute('x2', '120');
+        doorLine.setAttribute('y2', '150');
+      }
+      doorOpen = !doorOpen;
+    });
+
+    // Allgemeine Klickfunktion für andere Elemente
+    function selectElement(evt) {
+      const clickedId = evt.target.id 
+        || evt.target.getAttribute('data-row') + '-' + evt.target.getAttribute('data-col');
+      console.log("Geklickt auf:", clickedId);
+
+      // Falls schon etwas ausgewählt, mache "Aktion" daraus
+      if (selectedElementId && selectedElementId !== clickedId) {
+        // Highlight beim alten Element entfernen
+        unhighlight(selectedElementId);
+
+        // Demo-Aktion:
+        alert("Aktion: " + selectedElementId + " => " + clickedId);
+
+        // Auswahl zurücksetzen
+        selectedElementId = null;
+      } else if (!selectedElementId) {
+        // Neues Element auswählen
+        selectedElementId = clickedId;
+        highlight(evt.target);
+      } else {
+        // Gleiches Element nochmal geklickt => abwählen
+        unhighlight(selectedElementId);
+        selectedElementId = null;
       }
     }
 
-    // Beispiel-Aufruf:
-    // highlightRegalPosition(2,1); // Markiert Reihe 2, Feld 1
-    // highlightRegalPosition(3,4); // Markiert Reihe 3, Feld 4
+    function highlight(elem) {
+      elem.classList.add('highlight');
+    }
+    function unhighlight(elemId) {
+      // Versuchen, es per getElementById zu holen
+      const oldElem = document.getElementById(elemId);
+      if (oldElem) {
+        oldElem.classList.remove('highlight');
+      } else {
+        // Wenn es kein ID-Element ist (z.B. data-row/col), selektieren wir per Attribut
+        const rowCol = elemId.split('-');
+        if (rowCol.length === 2) {
+          const sel = '[data-row="' + rowCol[0] + '"][data-col="' + rowCol[1] + '"]';
+          const rect = document.querySelector(sel);
+          if (rect) rect.classList.remove('highlight');
+        }
+      }
+    }
+
+    // Klickbare IDs (Tore, Palettenplätze etc.)
+    const clickableIds = [
+      "tor2","tor3","tor4",
+      "ausgangTor1","ausgangTor2","ausgangTor3","ausgangTor4",
+      "platzL1","platzL2","platzL3","platzL4",
+      "platzR1","platzR2","platzR3","platzR4"
+    ];
+    clickableIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('click', selectElement);
+    });
+
+    // Auch die Regal-Felder anklickbar machen
+    const regalFelder = document.querySelectorAll('[data-row][data-col]');
+    regalFelder.forEach(f => f.addEventListener('click', selectElement));
   </script>
 
 </svg>
