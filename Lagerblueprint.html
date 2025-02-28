@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Lager Game – Blueprint mit Tür & Wänden</title>
+  <title>Lager Game – Wände bleiben, Tore offen, Palette mehrfach</title>
   <style>
     body {
       margin: 0;
@@ -34,100 +34,156 @@
 </head>
 <body>
 
-<h1>Lager-Simulation (Blueprint)</h1>
+<h1>Lager-Simulation (Wände durchgezogen, Tore offen, Palette & Tür)</h1>
 
 <svg id="blueprint" width="1300" height="800">
 
-  <!-- Titel oben -->
+  <!-- Überschrift im SVG -->
   <text x="280" y="40" font-size="18">
-    Kommissionier/Umlagerungsbereich mit Regalen und den dazu gehörigen Plätzen
+    Kommissionier/Umlagerungsbereich mit Regalen und offenen Toren
   </text>
 
-  <!-- Obere Rahmenlinie -->
-  <!-- jetzt inkl. Segment von x=120..200, damit über der Tür alles zu ist -->
-  <line x1="120" y1="80" x2="200" y2="80" stroke="black" stroke-width="2" />
+  <!-- Obere und untere Rahmenlinien -->
   <line x1="200" y1="80" x2="1000" y2="80" stroke="black" stroke-width="2" />
-
-  <!-- Untere Rahmenlinie -->
   <line x1="200" y1="680" x2="1000" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- Linker Vertikalbereich in Segmenten (inkl. Tür oben, dann Wände, dann Torlücken) -->
-  <!-- Tür schließt links bei x=120, Mauer bei x=200 -->
+  <!-- =======================================
+       LINIE LINKS: TÜR + WAND
+       ======================================= -->
+  <!-- Tür oben links: braune Linie y=80..150 an x=200 -->
+  <text x="185" y="70" font-size="14">Tür</text>
+  <line id="door" x1="200" y1="80" x2="200" y2="150" stroke="brown" stroke-width="4" />
 
-  <!-- 1) Mauer von (200,80) bis (200,230) = oberer Wandabschnitt -->
-  <line x1="200" y1="80" x2="200" y2="230" stroke="black" stroke-width="2" />
+  <!-- Wand-Segmente unterhalb der Tür: 
+       - (200,150)..(200,230)
+       - Dann Tor2-Bereich (230..270) weglassen
+       - (200,270)..(200,350)
+       - Tor3-Bereich (350..390) weglassen
+       - (200,390)..(200,470)
+       - Tor4-Bereich (470..510) weglassen
+       - (200,510)..(200,680)
+  -->
+  <line x1="200" y1="150" x2="200" y2="230" stroke="black" stroke-width="2" />
+  <line x1="200" y1="270" x2="200" y2="350" stroke="black" stroke-width="2" />
+  <line x1="200" y1="390" x2="200" y2="470" stroke="black" stroke-width="2" />
+  <line x1="200" y1="510" x2="200" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- 2) Mauer zwischen Tor2 und Tür: (200,230) bis (200,270) -->
-  <line x1="200" y1="230" x2="200" y2="270" stroke="black" stroke-width="2" />
+  <!-- Tore LINKS (ohne rechte Linie, nur oben, links, unten) -->
+  <!-- Tor2: von (120,230) nach (200,230), (120,230)->(120,270), (120,270)->(200,270) -->
+  <path id="tor2" 
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M120,230 H200
+          M120,230 V270
+          H200
+        " />
 
-  <!-- Tor2 (schwarzes Rechteck) => y=270..350 -->
-  <rect id="tor2" x="120" y="270" width="80" height="80" fill="black" />
+  <!-- Palette im Tor2-Bereich -->
+  <rect id="palette1" x="150" y="240" width="20" height="20" fill="orange" />
 
-  <!-- 3) Mauer zwischen Tor2 und Tor3: (200,350) bis (200,390) -->
-  <line x1="200" y1="350" x2="200" y2="390" stroke="black" stroke-width="2" />
+  <!-- Tor3 -->
+  <path id="tor3"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M120,350 H200
+          M120,350 V390
+          H200
+        " />
 
-  <!-- Tor3 => y=390..470 -->
-  <rect id="tor3" x="120" y="390" width="80" height="80" fill="black" />
+  <!-- Tor4 -->
+  <path id="tor4"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M120,470 H200
+          M120,470 V510
+          H200
+        " />
 
-  <!-- 4) Mauer zwischen Tor3 und Tor4: (200,470) bis (200,510) -->
-  <line x1="200" y1="470" x2="200" y2="510" stroke="black" stroke-width="2" />
-
-  <!-- Tor4 => y=510..590 -->
-  <rect id="tor4" x="120" y="510" width="80" height="80" fill="black" />
-
-  <!-- 5) Mauer unter Tor4 bis unten: (200,590) bis (200,680) -->
-  <line x1="200" y1="590" x2="200" y2="680" stroke="black" stroke-width="2" />
-
-  <!-- TÜR (als Linie, standardmäßig zu) -->
-  <!-- Geschlossen: verläuft vertikal von (120,80) bis (120,150) -->
-  <!-- Text "Tür" etwas darüber -->
-  <text x="110" y="70" font-size="14">Tür</text>
-  <line id="door" x1="120" y1="80" x2="120" y2="150" stroke="brown" stroke-width="4" />
-
-  <!-- Warenausgangsbereich (rechts) -->
-  <text x="1000" y="120" font-size="14">Warenausgang</text>
-  <rect id="ausgangTor1" x="1000" y="150" width="80" height="80" fill="black" />
-  <rect id="ausgangTor2" x="1000" y="270" width="80" height="80" fill="black" />
-  <rect id="ausgangTor3" x="1000" y="390" width="80" height="80" fill="black" />
-  <rect id="ausgangTor4" x="1000" y="510" width="80" height="80" fill="black" />
-
-  <!-- Rechte Rahmenlinie in Segmenten -->
+  <!-- =======================================
+       LINIE RECHTS: WAND + TORE
+       ======================================= -->
+  <!-- Wand-Segmente: 
+       - (1000,80)..(1000,150)
+       - Tor1-Bereich (150..230) weglassen
+       - (1000,230)..(1000,270)
+       - Tor2-Bereich (270..350) weglassen
+       - (1000,350)..(1000,390)
+       - Tor3-Bereich (390..470) weglassen
+       - (1000,470)..(1000,510)
+       - Tor4-Bereich (510..590) weglassen
+       - (1000,590)..(1000,680)
+  -->
   <line x1="1000" y1="80" x2="1000" y2="150" stroke="black" stroke-width="2" />
   <line x1="1000" y1="230" x2="1000" y2="270" stroke="black" stroke-width="2" />
   <line x1="1000" y1="350" x2="1000" y2="390" stroke="black" stroke-width="2" />
   <line x1="1000" y1="470" x2="1000" y2="510" stroke="black" stroke-width="2" />
   <line x1="1000" y1="590" x2="1000" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- 5 Regal-Reihen, 5 Felder pro Reihe => data-row, data-col -->
-  <!-- REIHE 1: y=80 -->
+  <!-- Warenausgang: Beschriftung -->
+  <text x="1000" y="120" font-size="14">Warenausgang</text>
+
+  <!-- Tore RECHTS (ohne linke Linie, nur oben, rechts, unten) -->
+  <!-- Tor1: (1000,150)->(1080,150), (1080,150)->(1080,230), (1080,230)->(1000,230) -->
+  <path id="ausgangTor1"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M1000,150 H1080
+          M1080,150 V230
+          H1000
+        " />
+
+  <!-- Tor2 -->
+  <path id="ausgangTor2"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M1000,270 H1080
+          M1080,270 V350
+          H1000
+        " />
+
+  <!-- Tor3 -->
+  <path id="ausgangTor3"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M1000,390 H1080
+          M1080,390 V470
+          H1000
+        " />
+
+  <!-- Tor4 -->
+  <path id="ausgangTor4"
+        fill="none" stroke="black" stroke-width="2"
+        d="
+          M1000,510 H1080
+          M1080,510 V590
+          H1000
+        " />
+
+  <!-- Regale (Beispiel) -->
   <rect x="350" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="1"/>
   <rect x="450" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="2"/>
   <rect x="550" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="3"/>
   <rect x="650" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="4"/>
   <rect x="750" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="5"/>
 
-  <!-- REIHE 2: y=160 -->
   <rect x="350" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="1"/>
   <rect x="450" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="2"/>
   <rect x="550" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="3"/>
   <rect x="650" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="4"/>
   <rect x="750" y="160" width="100" height="40" fill="none" stroke="black" data-row="2" data-col="5"/>
 
-  <!-- REIHE 3: y=240 -->
   <rect x="350" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="1"/>
   <rect x="450" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="2"/>
   <rect x="550" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="3"/>
   <rect x="650" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="4"/>
   <rect x="750" y="240" width="100" height="40" fill="none" stroke="black" data-row="3" data-col="5"/>
 
-  <!-- REIHE 4: y=320 -->
   <rect x="350" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="1"/>
   <rect x="450" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="2"/>
   <rect x="550" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="3"/>
   <rect x="650" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="4"/>
   <rect x="750" y="320" width="100" height="40" fill="none" stroke="black" data-row="4" data-col="5"/>
 
-  <!-- REIHE 5: y=400 -->
   <rect x="350" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="1"/>
   <rect x="450" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="2"/>
   <rect x="550" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="3"/>
@@ -152,53 +208,36 @@
   <rect id="platzR3" x="900" y="610" width="40" height="40" fill="black"/>
   <rect id="platzR4" x="950" y="610" width="40" height="40" fill="black"/>
 
-  <!-- Inline-Script: Tür-Logik und Klicklogik -->
-  <script>
-    // Spiellogik: Merken, ob die Tür offen oder zu ist
+  <!-- SPIELER: Blaues Rechteck -->
+  <rect id="player" x="160" y="100" width="20" height="20" fill="blue" />
+
+</svg>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    /**************************************************************
+     * Tür-Klick + Anklickbare Elemente
+     **************************************************************/
     let doorOpen = false;
-
-    // Merken, ob wir ein Element ausgewählt haben (z.B. Palettenplatz)
     let selectedElementId = null;
-
-    // Tür-Element
     const doorLine = document.getElementById('door');
 
-    // Beim Klicken auf die Tür togglen wir "auf/zu"
-    doorLine.addEventListener('click', () => {
-      if (!doorOpen) {
-        // Tür öffnen => horizontal (120,80) bis (170,80)
-        doorLine.setAttribute('x2', '170');
-        doorLine.setAttribute('y2', '80');
-      } else {
-        // Tür schließen => vertikal (120,80) bis (120,150)
-        doorLine.setAttribute('x2', '120');
-        doorLine.setAttribute('y2', '150');
-      }
-      doorOpen = !doorOpen;
+    doorLine.addEventListener('click', function() {
+      toggleDoor();
     });
 
-    // Allgemeine Klickfunktion für andere Elemente
     function selectElement(evt) {
       const clickedId = evt.target.id 
         || evt.target.getAttribute('data-row') + '-' + evt.target.getAttribute('data-col');
       console.log("Geklickt auf:", clickedId);
-
-      // Falls schon etwas ausgewählt, mache "Aktion" daraus
       if (selectedElementId && selectedElementId !== clickedId) {
-        // Highlight beim alten Element entfernen
         unhighlight(selectedElementId);
-
-        // Demo-Aktion:
         alert("Aktion: " + selectedElementId + " => " + clickedId);
-
-        // Auswahl zurücksetzen
         selectedElementId = null;
       } else if (!selectedElementId) {
-        // Neues Element auswählen
         selectedElementId = clickedId;
         highlight(evt.target);
       } else {
-        // Gleiches Element nochmal geklickt => abwählen
         unhighlight(selectedElementId);
         selectedElementId = null;
       }
@@ -208,12 +247,10 @@
       elem.classList.add('highlight');
     }
     function unhighlight(elemId) {
-      // Versuchen, es per getElementById zu holen
       const oldElem = document.getElementById(elemId);
       if (oldElem) {
         oldElem.classList.remove('highlight');
       } else {
-        // Wenn es kein ID-Element ist (z.B. data-row/col), selektieren wir per Attribut
         const rowCol = elemId.split('-');
         if (rowCol.length === 2) {
           const sel = '[data-row="' + rowCol[0] + '"][data-col="' + rowCol[1] + '"]';
@@ -223,24 +260,248 @@
       }
     }
 
-    // Klickbare IDs (Tore, Palettenplätze etc.)
     const clickableIds = [
       "tor2","tor3","tor4",
       "ausgangTor1","ausgangTor2","ausgangTor3","ausgangTor4",
       "platzL1","platzL2","platzL3","platzL4",
       "platzR1","platzR2","platzR3","platzR4"
     ];
-    clickableIds.forEach(id => {
+    clickableIds.forEach(function(id) {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', selectElement);
     });
 
-    // Auch die Regal-Felder anklickbar machen
     const regalFelder = document.querySelectorAll('[data-row][data-col]');
-    regalFelder.forEach(f => f.addEventListener('click', selectElement));
-  </script>
+    regalFelder.forEach(function(f) {
+      f.addEventListener('click', selectElement);
+    });
 
-</svg>
+    function toggleDoor() {
+      if (!doorOpen) {
+        // Tür öffnen (nach rechts)
+        doorLine.setAttribute('x2', '250');
+        doorLine.setAttribute('y2', '80');
+        console.log("Tür geöffnet!");
+      } else {
+        // Tür schließen (senkrecht)
+        doorLine.setAttribute('x2', '200');
+        doorLine.setAttribute('y2', '150');
+        console.log("Tür geschlossen!");
+      }
+      doorOpen = !doorOpen;
+    }
+
+    /**************************************************************
+     * SPIELER (WASD) + einfache KOLLISIONS-ERKENNUNG
+     **************************************************************/
+    let playerX = 160;
+    let playerY = 100;
+    const playerRect = document.getElementById('player');
+
+    // Wir definieren hier unsere Hindernisse (Wände, Regale, Torteile) als kleine Rechtecke
+    const regalFelderElems = document.querySelectorAll('[data-row][data-col]');
+    const obstacles = [
+      // Obere Linie
+      { x: 200, y: 78, width: 800, height: 4 },
+      // Untere Linie
+      { x: 200, y: 678, width: 800, height: 4 },
+
+      // Linke Wand-Segmente (ohne Tore)
+      { x: 198, y: 150, width: 4, height: 80 },
+      { x: 198, y: 270, width: 4, height: 80 },
+      { x: 198, y: 390, width: 4, height: 80 },
+      { x: 198, y: 510, width: 4, height: 170 },
+
+      // Rechte Wand-Segmente (ohne Tore)
+      { x: 998, y: 80, width: 4, height: 70 },
+      { x: 998, y: 230, width: 4, height: 40 },
+      { x: 998, y: 350, width: 4, height: 40 },
+      { x: 998, y: 470, width: 4, height: 40 },
+      { x: 998, y: 590, width: 4, height: 90 }
+    ];
+
+    // Regale als Hindernisse
+    regalFelderElems.forEach(function(r) {
+      const box = r.getBBox();
+      obstacles.push({
+        x: box.x,
+        y: box.y,
+        width: box.width,
+        height: box.height
+      });
+    });
+
+    // Tor-Linien LINKS (tor2, tor3, tor4) – je 3 Hindernisse (oben, links, unten)
+    // tor2: (120,230)->(200,230), (120,230)->(120,270), (120,270)->(200,270)
+    obstacles.push(
+      // tor2 oben
+      { x: 120, y: 228, width: 80, height: 4 },
+      // tor2 links
+      { x: 118, y: 230, width: 4, height: 40 },
+      // tor2 unten
+      { x: 120, y: 268, width: 80, height: 4 }
+    );
+
+    // tor3: (120,350)->(200,350), (120,350)->(120,390), (120,390)->(200,390)
+    obstacles.push(
+      { x: 120, y: 348, width: 80, height: 4 },
+      { x: 118, y: 350, width: 4, height: 40 },
+      { x: 120, y: 388, width: 80, height: 4 }
+    );
+
+    // tor4: (120,470)->(200,470), (120,470)->(120,510), (120,510)->(200,510)
+    obstacles.push(
+      { x: 120, y: 468, width: 80, height: 4 },
+      { x: 118, y: 470, width: 4, height: 40 },
+      { x: 120, y: 508, width: 80, height: 4 }
+    );
+
+    // Tor-Linien RECHTS (ausgangTor1..4) – je 3 Hindernisse (oben, rechts, unten)
+    // ausgangTor1: (1000,150)->(1080,150), (1080,150)->(1080,230), (1080,230)->(1000,230)
+    obstacles.push(
+      // oben
+      { x: 1000, y: 148, width: 80, height: 4 },
+      // rechts
+      { x: 1078, y: 150, width: 4, height: 80 },
+      // unten
+      { x: 1000, y: 228, width: 80, height: 4 }
+    );
+
+    // ausgangTor2: (1000,270)->(1080,270), (1080,270)->(1080,350), (1080,350)->(1000,350)
+    obstacles.push(
+      { x: 1000, y: 268, width: 80, height: 4 },
+      { x: 1078, y: 270, width: 4, height: 80 },
+      { x: 1000, y: 348, width: 80, height: 4 }
+    );
+
+    // ausgangTor3: (1000,390)->(1080,390), (1080,390)->(1080,470), (1080,470)->(1000,470)
+    obstacles.push(
+      { x: 1000, y: 388, width: 80, height: 4 },
+      { x: 1078, y: 390, width: 4, height: 80 },
+      { x: 1000, y: 468, width: 80, height: 4 }
+    );
+
+    // ausgangTor4: (1000,510)->(1080,510), (1080,510)->(1080,590), (1080,590)->(1000,590)
+    obstacles.push(
+      { x: 1000, y: 508, width: 80, height: 4 },
+      { x: 1078, y: 510, width: 4, height: 80 },
+      { x: 1000, y: 588, width: 80, height: 4 }
+    );
+
+    function getObstacles() {
+      const obs = obstacles.slice();
+      // Tür blockieren, wenn sie zu ist (200,80..150)
+      if (!doorOpen) {
+        obs.push({ x: 200, y: 80, width: 4, height: 70 });
+      }
+      return obs;
+    }
+
+    function rectsIntersect(r1, r2) {
+      return !(
+        r2.x > r1.x + r1.width ||
+        r2.x + r2.width < r1.x ||
+        r2.y > r1.y + r1.height ||
+        r2.y + r2.height < r1.y
+      );
+    }
+
+    function checkCollision(newRect) {
+      const obs = getObstacles();
+      for (let o of obs) {
+        if (rectsIntersect(newRect, o)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function movePlayer(dx, dy) {
+      let newX = playerX + dx;
+      let newY = playerY + dy;
+      // Grenzen (0..1280, 0..780)
+      newX = Math.max(0, Math.min(1280, newX));
+      newY = Math.max(0, Math.min(780, newY));
+
+      const newRect = { x: newX, y: newY, width: 20, height: 20 };
+      if (checkCollision(newRect)) {
+        console.log("Kollision!");
+        return;
+      }
+      playerX = newX;
+      playerY = newY;
+      playerRect.setAttribute('x', playerX);
+      playerRect.setAttribute('y', playerY);
+    }
+
+    /**************************************************************
+     * PALETTE (mehrfach aufnehmbar/ablegbar)
+     **************************************************************/
+    let carryingItem = null; // "palette1" oder null
+    const palette1 = document.getElementById('palette1');
+
+    function handleInteraction() {
+      // 1) Tür check (ob man in Reichweite ist)
+      const pxCenter = playerX + 10;
+      const pyCenter = playerY + 10;
+      if (pxCenter >= 180 && pxCenter <= 220 && pyCenter >= 70 && pyCenter <= 160) {
+        toggleDoor();
+        return;
+      }
+
+      // 2) Palette check
+      const playerRectTemp = { x: playerX, y: playerY, width: 20, height: 20 };
+      const palBox = palette1.getBBox();
+      const palRect = { x: palBox.x, y: palBox.y, width: palBox.width, height: palBox.height };
+
+      if (!carryingItem) {
+        // Falls wir nichts tragen -> prüfen, ob wir die Palette berühren
+        if (rectsIntersect(playerRectTemp, palRect)) {
+          carryingItem = "palette1";
+          palette1.setAttribute('visibility', 'hidden');
+          console.log("Palette aufgenommen!");
+        } else {
+          console.log("Keine Palette in Reichweite.");
+        }
+      } else {
+        // Tragen -> ablegen
+        if (carryingItem === "palette1") {
+          palette1.removeAttribute('visibility');
+          palette1.setAttribute('x', playerX);
+          palette1.setAttribute('y', playerY);
+          console.log("Palette abgelegt bei x=" + playerX + ", y=" + playerY);
+          carryingItem = null;
+        }
+      }
+    }
+
+    // Tastatur (WASD + Space)
+    document.addEventListener('keydown', function(event) {
+      const key = event.key.toLowerCase();
+      const step = 10;
+      switch (key) {
+        case 'w':
+          movePlayer(0, -step);
+          break;
+        case 'a':
+          movePlayer(-step, 0);
+          break;
+        case 's':
+          movePlayer(0, step);
+          break;
+        case 'd':
+          movePlayer(step, 0);
+          break;
+        case ' ':
+        case 'space':
+          handleInteraction();
+          break;
+        default:
+          break;
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
