@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Lager Game – Wände bleiben, Tore offen, Palette mehrfach</title>
+  <title>Lager Game</title>
   <style>
     body {
       margin: 0;
@@ -34,14 +34,9 @@
 </head>
 <body>
 
-<h1>Lager-Simulation (Wände durchgezogen, Tore offen, Palette & Tür)</h1>
+<h1>Lager-Simulation</h1>
 
 <svg id="blueprint" width="1300" height="800">
-
-  <!-- Überschrift im SVG -->
-  <text x="280" y="40" font-size="18">
-    Kommissionier/Umlagerungsbereich mit Regalen und offenen Toren
-  </text>
 
   <!-- Obere und untere Rahmenlinien -->
   <line x1="200" y1="80" x2="1000" y2="80" stroke="black" stroke-width="2" />
@@ -69,7 +64,7 @@
   <line x1="200" y1="510" x2="200" y2="680" stroke="black" stroke-width="2" />
 
   <!-- Tore LINKS (ohne rechte Linie, nur oben, links, unten) -->
-  <!-- Tor2: von (120,230) nach (200,230), (120,230)->(120,270), (120,270)->(200,270) -->
+  <!-- Tor2 -->
   <path id="tor2" 
         fill="none" stroke="black" stroke-width="2"
         d="
@@ -117,13 +112,12 @@
   <line x1="1000" y1="230" x2="1000" y2="270" stroke="black" stroke-width="2" />
   <line x1="1000" y1="350" x2="1000" y2="390" stroke="black" stroke-width="2" />
   <line x1="1000" y1="470" x2="1000" y2="510" stroke="black" stroke-width="2" />
+  <!-- Hier durchgehende Wand (statt Tor4) -->
+  <line x1="1000" y1="510" x2="1000" y2="590" stroke="black" stroke-width="2" />
   <line x1="1000" y1="590" x2="1000" y2="680" stroke="black" stroke-width="2" />
 
-  <!-- Warenausgang: Beschriftung -->
-  <text x="1000" y="120" font-size="14">Warenausgang</text>
-
   <!-- Tore RECHTS (ohne linke Linie, nur oben, rechts, unten) -->
-  <!-- Tor1: (1000,150)->(1080,150), (1080,150)->(1080,230), (1080,230)->(1000,230) -->
+  <!-- Tor1 -->
   <path id="ausgangTor1"
         fill="none" stroke="black" stroke-width="2"
         d="
@@ -150,16 +144,9 @@
           H1000
         " />
 
-  <!-- Tor4 -->
-  <path id="ausgangTor4"
-        fill="none" stroke="black" stroke-width="2"
-        d="
-          M1000,510 H1080
-          M1080,510 V590
-          H1000
-        " />
+  <!-- (ausgangTor4 entfernt) -->
 
-  <!-- Regale (Beispiel) -->
+  <!-- Regale -->
   <rect x="350" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="1"/>
   <rect x="450" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="2"/>
   <rect x="550" y="80"  width="100" height="40" fill="none" stroke="black" data-row="1" data-col="3"/>
@@ -191,22 +178,20 @@
   <rect x="750" y="400" width="100" height="40" fill="none" stroke="black" data-row="5" data-col="5"/>
 
   <!-- Palettenabstellplätze unten links (2×2) -->
-  <text x="220" y="550" font-size="12">
-    Palettenabstellplätze (4 Stück) zw. Wareneingang & Regalen
-  </text>
   <rect id="platzL1" x="210" y="560" width="40" height="40" fill="black"/>
   <rect id="platzL2" x="260" y="560" width="40" height="40" fill="black"/>
   <rect id="platzL3" x="210" y="610" width="40" height="40" fill="black"/>
   <rect id="platzL4" x="260" y="610" width="40" height="40" fill="black"/>
+  <!-- Beschriftung: weiter links (x=120) und etwas höher (y=550) -->
+  <text x="120" y="550" font-size="12">Palettenabstellplätze</text>
 
   <!-- Palettenabstellplätze unten rechts (2×2) -->
-  <text x="730" y="550" font-size="12">
-    Palettenabstellplätze (4 Stück) zw. Regalen & Warenausgang
-  </text>
   <rect id="platzR1" x="900" y="560" width="40" height="40" fill="black"/>
   <rect id="platzR2" x="950" y="560" width="40" height="40" fill="black"/>
   <rect id="platzR3" x="900" y="610" width="40" height="40" fill="black"/>
   <rect id="platzR4" x="950" y="610" width="40" height="40" fill="black"/>
+  <!-- Beschriftung für die rechten Plätze -->
+  <text x="885" y="675" font-size="12">Palettenabstellplätze</text>
 
   <!-- SPIELER: Blaues Rechteck -->
   <rect id="player" x="160" y="100" width="20" height="20" fill="blue" />
@@ -260,9 +245,10 @@
       }
     }
 
+    // Hinweis: "ausgangTor4" entfernt
     const clickableIds = [
       "tor2","tor3","tor4",
-      "ausgangTor1","ausgangTor2","ausgangTor3","ausgangTor4",
+      "ausgangTor1","ausgangTor2","ausgangTor3",
       "platzL1","platzL2","platzL3","platzL4",
       "platzR1","platzR2","platzR3","platzR4"
     ];
@@ -298,7 +284,7 @@
     let playerY = 100;
     const playerRect = document.getElementById('player');
 
-    // Wir definieren hier unsere Hindernisse (Wände, Regale, Torteile) als kleine Rechtecke
+    // Hindernisse (Wände, Regale, Tore) als Rechtecke
     const regalFelderElems = document.querySelectorAll('[data-row][data-col]');
     const obstacles = [
       // Obere Linie
@@ -317,7 +303,7 @@
       { x: 998, y: 230, width: 4, height: 40 },
       { x: 998, y: 350, width: 4, height: 40 },
       { x: 998, y: 470, width: 4, height: 40 },
-      { x: 998, y: 590, width: 4, height: 90 }
+      { x: 998, y: 590, width: 4, height: 90 } // durchgehende Wand 510..590
     ];
 
     // Regale als Hindernisse
@@ -331,62 +317,47 @@
       });
     });
 
-    // Tor-Linien LINKS (tor2, tor3, tor4) – je 3 Hindernisse (oben, links, unten)
-    // tor2: (120,230)->(200,230), (120,230)->(120,270), (120,270)->(200,270)
+    // Tor-Linien LINKS (tor2, tor3, tor4) – je 3 Hindernisse
+    // tor2
     obstacles.push(
-      // tor2 oben
       { x: 120, y: 228, width: 80, height: 4 },
-      // tor2 links
       { x: 118, y: 230, width: 4, height: 40 },
-      // tor2 unten
       { x: 120, y: 268, width: 80, height: 4 }
     );
-
-    // tor3: (120,350)->(200,350), (120,350)->(120,390), (120,390)->(200,390)
+    // tor3
     obstacles.push(
       { x: 120, y: 348, width: 80, height: 4 },
       { x: 118, y: 350, width: 4, height: 40 },
       { x: 120, y: 388, width: 80, height: 4 }
     );
-
-    // tor4: (120,470)->(200,470), (120,470)->(120,510), (120,510)->(200,510)
+    // tor4
     obstacles.push(
       { x: 120, y: 468, width: 80, height: 4 },
       { x: 118, y: 470, width: 4, height: 40 },
       { x: 120, y: 508, width: 80, height: 4 }
     );
 
-    // Tor-Linien RECHTS (ausgangTor1..4) – je 3 Hindernisse (oben, rechts, unten)
-    // ausgangTor1: (1000,150)->(1080,150), (1080,150)->(1080,230), (1080,230)->(1000,230)
+    // Tor-Linien RECHTS (ausgangTor1..3) – je 3 Hindernisse
+    // ausgangTor1
     obstacles.push(
-      // oben
       { x: 1000, y: 148, width: 80, height: 4 },
-      // rechts
       { x: 1078, y: 150, width: 4, height: 80 },
-      // unten
       { x: 1000, y: 228, width: 80, height: 4 }
     );
-
-    // ausgangTor2: (1000,270)->(1080,270), (1080,270)->(1080,350), (1080,350)->(1000,350)
+    // ausgangTor2
     obstacles.push(
       { x: 1000, y: 268, width: 80, height: 4 },
       { x: 1078, y: 270, width: 4, height: 80 },
       { x: 1000, y: 348, width: 80, height: 4 }
     );
-
-    // ausgangTor3: (1000,390)->(1080,390), (1080,390)->(1080,470), (1080,470)->(1000,470)
+    // ausgangTor3
     obstacles.push(
       { x: 1000, y: 388, width: 80, height: 4 },
       { x: 1078, y: 390, width: 4, height: 80 },
       { x: 1000, y: 468, width: 80, height: 4 }
     );
 
-    // ausgangTor4: (1000,510)->(1080,510), (1080,510)->(1080,590), (1080,590)->(1000,590)
-    obstacles.push(
-      { x: 1000, y: 508, width: 80, height: 4 },
-      { x: 1078, y: 510, width: 4, height: 80 },
-      { x: 1000, y: 588, width: 80, height: 4 }
-    );
+    // ausgangTor4 entfernt
 
     function getObstacles() {
       const obs = obstacles.slice();
@@ -410,6 +381,7 @@
       const obs = getObstacles();
       for (let o of obs) {
         if (rectsIntersect(newRect, o)) {
+          console.log("Kollision!");
           return true;
         }
       }
@@ -425,7 +397,6 @@
 
       const newRect = { x: newX, y: newY, width: 20, height: 20 };
       if (checkCollision(newRect)) {
-        console.log("Kollision!");
         return;
       }
       playerX = newX;
@@ -500,6 +471,33 @@
           break;
       }
     });
+
+    /**************************************************************
+     * REGAL-BESCHRIFTUNG
+     * Für jedes Regal-Rechteck (mit data-row und data-col) wird
+     * ein Text-Element mit der Beschriftung "Reihe.Spalt" erstellt.
+     **************************************************************/
+    const regalRechtecke = document.querySelectorAll('rect[data-row][data-col]');
+    regalRechtecke.forEach(function(rect) {
+      const row = rect.getAttribute('data-row');
+      const col = rect.getAttribute('data-col');
+      const x = parseFloat(rect.getAttribute('x'));
+      const y = parseFloat(rect.getAttribute('y'));
+      const width = parseFloat(rect.getAttribute('width'));
+      const height = parseFloat(rect.getAttribute('height'));
+      const label = row + '.' + col;
+      
+      const textElem = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      // Zentriert im Rechteck; y wird etwas angepasst
+      textElem.setAttribute('x', x + width / 2);
+      textElem.setAttribute('y', y + height / 2 + 5);
+      textElem.setAttribute('text-anchor', 'middle');
+      textElem.setAttribute('fill', 'black');
+      textElem.setAttribute('font-size', '14');
+      textElem.textContent = label;
+      rect.parentNode.appendChild(textElem);
+    });
+    
   });
 </script>
 
